@@ -2,34 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Task;
-use App\Http\Requests\TaskRequest;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Resources\TaskResource;
+use App\Services\TaskService;
 
 class TaskController extends Controller
 {
-    //
-    public function store(Request $request)
-    {
-        //
-    }
-    public function update(TaskRequest $request, Task $task)
-    {
-        //
-        $this->authorize('update', $task);
+    public function __construct(
+        protected TaskService $taskService
+    ) {}
 
-        $task->update($request->validated());
+    public function store(StoreTaskRequest $request)
+    {
+        $task = $this->taskService->create(
+            $request->validated(),
+            auth()->id()
+        );
 
-        return response()->json([
-            'message' => 'Task updated successfully'
-        ]);
-    }
-    public function destroy(Request $request, $id)
-    {
-        //
-    }
-    public function show($id)
-    {
-        //
+        return new TaskResource($task);
     }
 }
